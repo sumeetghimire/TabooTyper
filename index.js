@@ -1,37 +1,9 @@
-class TabooTyper {
-    constructor(options) {
-      this.selector = options.selector || "input, textarea"; // Default selector for all inputs and textareas
-      this.bannedWords = options.bannedWords || {};
-      this.masked = options.masked || false;
-      this.init();
-    }
-  
-    init() {
-      // Allow user to pass any valid CSS selector (including IDs, classes, or element types)
-      const elements = document.querySelectorAll(this.selector);
-      elements.forEach((el) => {
-        el.addEventListener("input", (e) => this.replaceWords(e.target));
-      });
-    }
-  
-    replaceWords(input) {
-      let text = input.value;
-      for (let word in this.bannedWords) {
-        let regex = new RegExp(`\\b${word}\\b`, "gi");
-  
-        if (this.masked) {
-          text = text.replace(regex, "*".repeat(word.length)); // Mask words
-        } else {
-          text = text.replace(regex, this.bannedWords[word]); // Replace words
-        }
-      }
-      input.value = text;
-    }
-  }
-  
-  // Export for Node.js or Browser
-  if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
-    module.exports = TabooTyper;
-  } else {
-    window.TabooTyper = TabooTyper;
-  }
+/*!
+ * TabooTyper Library
+ * Copyright (c) 2025 Sumeet Ghimire
+ * Released under the MIT License
+ * Version :1.0.2
+ * https://github.com/sumeetghimire/TabooTyper
+ */
+
+class TabooTyper{constructor(e){this.selector=e.selector,this.bannedWords=e.bannedWords||{},this.masked=e.masked||!1,this.maskCharacter=e.maskCharacter||"*",this.caseSensitive=e.caseSensitive||!1,this.trackFrequency=e.trackFrequency||!1,this.highlight=e.highlight||!1,this.suggestions=e.suggestions||!1,this.contextSensitive=e.contextSensitive||!1,this.emojiMasking=e.emojiMasking||!1,this.historyMode=e.historyMode||!1,this.warningStyle=e.warningStyle||"inline",this.showPopup=e.showPopup||!0,this.popupBackgroundColor=e.popupBackgroundColor||"red",this.popupTextColor=e.popupTextColor||"white",this.wordFrequency={},this.init()}init(){document.querySelectorAll(this.selector).forEach((e=>{e.addEventListener("input",(e=>this.handleInput(e)))}))}handleInput(e){const t=e.target;let s=t.value,i=!1;this.trackFrequency&&this.trackWordFrequency(s),Object.keys(this.bannedWords).forEach((e=>{let t=new RegExp(`\\b${e}\\b`,this.caseSensitive?"g":"gi");if(t.test(s)){const o=this.bannedWords[e];s=this.replaceOrMaskWord(s,e,o,t),"popup"===this.warningStyle&&this.showPopup&&(i=!0)}})),this.highlight&&(s=this.highlightBadWords(s)),t.value=s,i&&this.showPopup&&this.showPopupWarning()}replaceOrMaskWord(e,t,s,i){return this.masked?e.replace(i,this.maskWord(t)):e.replace(i,s)}maskWord(e){return this.emojiMasking?this.getEmojiMask():this.maskCharacter.repeat(e.length)}getEmojiMask(){const e=["😡","🤬","😤","💥","💣"];return e[Math.floor(Math.random()*e.length)]}trackWordFrequency(e){e.split(/\s+/).forEach((e=>{this.bannedWords[e.toLowerCase()]&&(this.wordFrequency[e]=(this.wordFrequency[e]||0)+1)}))}highlightBadWords(e){return Object.keys(this.bannedWords).forEach((t=>{let s=new RegExp(`\\b${t}\\b`,this.caseSensitive?"g":"gi");e=e.replace(s,(e=>`<span class="highlight">${e}</span>`))})),e}showPopupWarning(){const e=document.createElement("div");e.textContent="Warning: Offensive word detected and replaced.",e.style.position="fixed",e.style.top="20px",e.style.left="50%",e.style.transform="translateX(-50%)",e.style.backgroundColor=this.popupBackgroundColor,e.style.color=this.popupTextColor,e.style.padding="10px",e.style.borderRadius="5px",e.style.zIndex="9999",document.body.appendChild(e),setTimeout((()=>{document.body.removeChild(e)}),3e3)}static addBannedWord(e,t){this.bannedWords[e]=t}static removeBannedWord(e){delete this.bannedWords[e]}}
